@@ -1,0 +1,28 @@
+<h1>Listing Entities</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Number</th>
+      <th>Name</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for entity <- @entities do %>
+    <tr>
+      <td><%= entity.number %></td>
+      <td><%= entity.name %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.entity_path(@conn, :show, entity) %></span>
+        <span><%= link "Edit", to: Routes.entity_path(@conn, :edit, entity) %></span>
+        <span><%= link "Delete", to: Routes.entity_path(@conn, :delete, entity), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Entity", to: Routes.entity_path(@conn, :new) %></span>

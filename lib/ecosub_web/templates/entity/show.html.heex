@@ -1,0 +1,18 @@
+<h1>Show Entity</h1>
+
+<ul>
+
+  <li>
+    <strong>Number:</strong>
+    <%= @entity.number %>
+  </li>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @entity.name %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.entity_path(@conn, :edit, @entity) %></span> |
+<span><%= link "Back", to: Routes.entity_path(@conn, :index) %></span>
