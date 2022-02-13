@@ -1,6 +1,7 @@
 defmodule EcoSub.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  alias __MODULE__
   alias EcoSub.Accounts.{RecoveryCode, Profile}
 
   schema "user" do
@@ -9,7 +10,7 @@ defmodule EcoSub.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
-    field :totp, :string
+    field :totp, :binary
     field :totp_failures, :integer, default: 0
     field :last_totp_at, :utc_datetime
     field :recovery_code_failures, :integer, default: 0
@@ -49,6 +50,11 @@ defmodule EcoSub.Accounts.User do
     |> cast(attrs, [:email, :password])
     |> validate_email()
     |> validate_password(opts)
+  end
+
+  def totp_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:totp])
   end
 
   defp validate_email(changeset) do
@@ -136,7 +142,7 @@ defmodule EcoSub.Accounts.User do
   If there is no user or the user doesn't have a password, we call
   `Argon2.no_user_verify/0` to avoid timing attacks.
   """
-  def valid_password?(%EcoSub.Accounts.User{hashed_password: hashed_password}, password)
+  def valid_password?(%User{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do
     Argon2.verify_pass(password, hashed_password)
   end
@@ -145,6 +151,12 @@ defmodule EcoSub.Accounts.User do
     Argon2.no_user_verify()
     false
   end
+
+  def valid_totp?(%User{totp: secret}, code) when is_binary(secret) when is_binary(code) do
+    NimbleTOTP.valid?(secret, code)
+  end
+
+  def valid_totp?(_, _), do: false
 
   @doc """
   Validates the current password otherwise adds an error to the changeset.

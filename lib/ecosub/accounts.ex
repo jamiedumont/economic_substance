@@ -6,7 +6,7 @@ defmodule EcoSub.Accounts do
   import Ecto.Query, warn: false
   alias EcoSub.Repo
 
-  alias EcoSub.Accounts.{User, UserToken, UserNotifier}
+  alias EcoSub.Accounts.{User, UserToken, UserNotifier, RecoveryCode, Profile}
 
   ## Database getters
 
@@ -357,7 +357,57 @@ defmodule EcoSub.Accounts do
     |> Repo.update()
   end
 
-  alias EcoSub.Accounts.Profile
+  def validate_user_totp(%User{} = user, code) do
+    cond do
+      User.valid_totp?(user, code) ->
+        # AuditLog.audit!(audit_context, "accounts.user_totp.validated", %{user_id: user.id})
+        :valid_totp
+
+      {:ok, count} = validate_recovery_code(user, code) ->
+        {:valid_backup_code, count}
+
+      true ->
+        :invalid
+    end
+  end
+
+  def validate_recovery_code(%User{} = user, code) when is_binary(code) do
+    code = Repo.one(from r in RecoveryCode,
+      where: r.user_id == ^user.id
+        and r.code == ^code
+        and is_nil(r.used_at)
+      )
+
+    # Enum.count(recovery_codes, &is_nil(&1.used_at))
+  end
+
+  # def validate_user_totp(audit_context, user, code) do
+  #   totp = Repo.get_by!(UserTOTP, user_id: user.id)
+
+  #   cond do
+  #     UserTOTP.valid_totp?(totp, code) ->
+  #       AuditLog.audit!(audit_context, "accounts.user_totp.validated", %{user_id: user.id})
+  #       :valid_totp
+
+  #     changeset = UserTOTP.validate_backup_code(totp, code) ->
+  #       {:ok, totp} =
+  #         Repo.transaction(fn ->
+  #           AuditLog.audit!(audit_context, "accounts.user_totp.validated_with_backup_code", %{
+  #             user_id: user.id
+  #           })
+
+  #           Repo.update!(changeset)
+  #         end)
+
+  #       {:valid_backup_code, Enum.count(totp.backup_codes, &is_nil(&1.used_at))}
+
+  #     true ->
+  #       AuditLog.audit!(audit_context, "accounts.user_totp.invalid_code_used", %{user_id: user.id})
+
+  #       :invalid
+  #   end
+  # end
+
 
   @doc """
   Returns the list of profiles.

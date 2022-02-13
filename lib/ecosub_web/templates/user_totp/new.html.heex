@@ -1,0 +1,25 @@
+<%= if @error_message do %>
+  <div class="alert alert-danger">
+    <div><%= @error_message %></div>
+  </div>
+<% end %>
+
+<div>
+  <h4>Two-factor authentication</h4>
+  <p>Enter the six-digit code from your device or any of your eight-character backup codes to finish logging in.</p>
+</div>
+
+<.form let={f} for={@conn} action={Routes.user_totp_path(@conn, :create)} as={:user}>
+    <%= if @error_message do %>
+      <div class="alert alert-danger">
+        <p><%= @error_message %></p>
+      </div>
+    <% end %>
+  
+    <%= label f, :code %>
+    <%= number_input f, :code, required: true %>
+
+    <div>
+      <%= submit "Verify code and log in" %>
+    </div>
+  </.form>

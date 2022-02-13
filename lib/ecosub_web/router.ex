@@ -66,6 +66,8 @@ defmodule EcoSubWeb.Router do
     post "/user/register", UserRegistrationController, :create
     get "/user/log_in", UserSessionController, :new
     post "/user/log_in", UserSessionController, :create
+    get "/user/totp", UserTotpController, :new
+    post "/user/totp", UserTotpController, :create
     get "/user/reset_password", UserResetPasswordController, :new
     post "/user/reset_password", UserResetPasswordController, :create
     get "/user/reset_password/:token", UserResetPasswordController, :edit
