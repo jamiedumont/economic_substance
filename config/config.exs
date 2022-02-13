@@ -9,7 +9,8 @@ import Config
 
 config :ecosub,
   namespace: EcoSub,
-  ecto_repos: [EcoSub.Repo]
+  ecto_repos: [EcoSub.Repo],
+  terms_last_updated: DateTime.new!(~D[2022-01-01], ~T[09:00:00.0])
 
 # Configures the endpoint
 config :ecosub, EcoSubWeb.Endpoint,

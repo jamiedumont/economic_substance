@@ -1,0 +1,15 @@
+<p>Terms go here</p>
+
+<.form let={f} for={@conn} action={Routes.page_path(@conn, :agree_to_terms)}>
+  
+    <%= label f, :checked, "I agree to all the above" %>
+    <%= checkbox f, :checked, required: true %>
+  
+    <div>
+      <%= submit "Agree to terms" %>
+    </div>
+  </.form>
+
+  <%= if @user.terms_agreed_at do %>
+    <p>Terms agreed at <%= @user.terms_agreed_at %></p>
+  <% end %>

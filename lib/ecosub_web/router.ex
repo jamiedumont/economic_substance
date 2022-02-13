@@ -80,8 +80,17 @@ defmodule EcoSubWeb.Router do
     get "/user/settings/confirm_email/:token", UserSettingsController, :confirm_email
   end
 
+  scope "/entity", EcoSubWeb do
+    pipe_through [:browser, :require_authenticated_user, :require_terms_agreed]
+
+    get "/", PageController, :entity
+  end
+
   scope "/", EcoSubWeb do
     pipe_through [:browser]
+
+    get "/terms", PageController, :view_terms
+    post "/terms", PageController, :agree_to_terms
 
     delete "/user/log_out", UserSessionController, :delete
     get "/user/confirm", UserConfirmationController, :new

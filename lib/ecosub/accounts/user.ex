@@ -13,10 +13,16 @@ defmodule EcoSub.Accounts.User do
     field :totp_failures, :integer, default: 0
     field :last_totp_at, :utc_datetime
     field :recovery_code_failures, :integer, default: 0
+    field :password_failures, :integer, default: 0, null: false
+    field :lockout_ends, :utc_datetime, default: nil, null: true
+
+    field :terms_agreed_at, :utc_datetime, default: nil
+    field :active, :boolean, default: false, null: false
+    field :invite_sent, :utc_datetime, default: nil, null: true
+    field :is_admin, :boolean, default: false, null: false
 
     has_many :recovery_codes, RecoveryCode
     has_many :profiles, Profile
-
 
     timestamps()
   end
@@ -90,6 +96,11 @@ defmodule EcoSub.Accounts.User do
       %{changes: %{email: _}} = changeset -> changeset
       %{} = changeset -> add_error(changeset, :email, "did not change")
     end
+  end
+
+  def terms_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:terms_agreed_at])
   end
 
   @doc """

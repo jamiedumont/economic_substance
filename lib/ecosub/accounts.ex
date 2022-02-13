@@ -351,6 +351,12 @@ defmodule EcoSub.Accounts do
     end
   end
 
+  def agree_to_terms(user, attrs) do
+    user
+    |> User.terms_changeset(attrs)
+    |> Repo.update()
+  end
+
   alias EcoSub.Accounts.Profile
 
   @doc """

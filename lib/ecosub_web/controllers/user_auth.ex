@@ -139,6 +139,21 @@ defmodule EcoSubWeb.UserAuth do
     end
   end
 
+  def require_terms_agreed(conn, _opts) do
+    terms_last_updated = EcoSub.config([:terms_last_updated])
+    %EcoSub.Accounts.User{terms_agreed_at: terms_agreed_at} = conn.assigns[:current_user]
+
+    if terms_agreed_at > terms_last_updated do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You must agree to the terms of use")
+      |> maybe_store_return_to()
+      |> redirect(to: Routes.page_path(conn, :view_terms))
+      |> halt()
+    end
+  end
+
   defp maybe_store_return_to(%{method: "GET"} = conn) do
     put_session(conn, :user_return_to, current_path(conn))
   end
